@@ -12,6 +12,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private Button continueButton, createTopic;
     private EditText editTopicValue;
+    public static final String EXTRA_TEXT = "com.example.mypassmanager.topic_name";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openTopicActivity(){
+        EditText editText = findViewById(R.id.editTopic);
+        String topicName = editText.getText().toString();
         Intent intent = new Intent(this, Pass_table.class);
+        intent.putExtra(EXTRA_TEXT, topicName);
         startActivity(intent);
     }
 
