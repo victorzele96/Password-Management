@@ -5,9 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.File;
+import android.widget.*;
 
 public class MainActivity extends AppCompatActivity {
     private Button continueButton, createTopic;
@@ -19,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.continueButton = findViewById(R.id.continueButton);
+        this.continueButton = (Button) findViewById(R.id.continueButton);
         this.continueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        this.createTopic = findViewById(R.id.createTopic);
+        this.createTopic = (Button) findViewById(R.id.createTopic);
         this.createTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        this.editTopicValue = findViewById(R.id.editTopic);
+        this.editTopicValue = (EditText) findViewById(R.id.editTopic);
         this.editTopicValue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,25 +48,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openTopicActivity(){
-        EditText editText = findViewById(R.id.editTopic);
-        String topicName = editText.getText().toString();
-        Intent intent = new Intent(this, Pass_table.class);
-        intent.putExtra(EXTRA_TEXT, topicName);
-        startActivity(intent);
+        String topicName = this.editTopicValue.getText().toString();
+        if(topicName.equals("Fill in topic") || topicName.equals("")) {
+            topicError("");
+            Toast.makeText(this, "Try another name topic!!! ", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Intent intent = new Intent(this, Pass_table.class);
+            intent.putExtra(EXTRA_TEXT, topicName);
+            startActivity(intent);
+        }
     }
 
     public void createNewTopic(){
-        EditText editText = findViewById(R.id.editTopic);
-        String topicName = editText.getText().toString();
-
-
-        Toast.makeText(MainActivity.this, "Topic created successfully.", Toast.LENGTH_SHORT).show();
+        String topicName = this.editTopicValue.getText().toString();
+        if(topicName.length() == 0 || topicName.equals("Fill in topic"))
+            topicError("Cannot create empty topic");
+        else {// open new empty file called by editTopicValue
+            try {
+                FileOutputStream fOut = openFileOutput(topicName, MODE_PRIVATE);
+                fOut.close();
+                File fileDir = new File(getFilesDir(), topicName);//get dir of file where he saved
+                Toast.makeText(getBaseContext(), "File Saved at " + fileDir, Toast.LENGTH_LONG).show();
+//                Toast.makeText(MainActivity.this, "Topic created successfully.", Toast.LENGTH_SHORT).show();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
     }
     public void resetEditTopic(){
-        EditText editText = findViewById(R.id.editTopic);
-        String topicName = editText.getText().toString();
+        String topicName = this.editTopicValue.getText().toString();
 
         if(topicName.equals("Fill in topic"))
-            editText.setText("");
+            this.editTopicValue.setText("");
+    }
+
+    public void topicError(String errorType){
+        this.editTopicValue.setError(errorType);
     }
 }
