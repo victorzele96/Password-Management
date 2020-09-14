@@ -1,5 +1,6 @@
 package com.example.mypassmanager;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,6 +19,9 @@ import java.util.ArrayList;
 public class Pass_table extends AppCompatActivity {
     private ListView listView;
     private String topicName;
+    private Button deleteTopic, updatePass, removePass, addPass;
+    private int choice;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,35 +29,84 @@ public class Pass_table extends AppCompatActivity {
 
         Intent intent = getIntent();
         this.topicName = intent.getStringExtra(MainActivity.EXTRA_TEXT);
-        TextView textView = (TextView) findViewById(R.id.topicName);
+        final TextView textView = (TextView) findViewById(R.id.topicName);
         textView.setText(this.topicName);
 
-
-
+        this.addPass = findViewById(R.id.add);
+        this.removePass = findViewById(R.id.remove);
+        this.updatePass = findViewById(R.id.update);
+        this.deleteTopic = findViewById(R.id.deleteTopic);
 
         this.listView = (ListView) findViewById(R.id.dataView);
-
-        ArrayList<String> subjectName = new ArrayList<>();
-        ArrayList<String> bodyOfSubject = new ArrayList<>();
-
-
-        subjectName.add("victor");
-        int choice = subjectName.indexOf("victor");
-        bodyOfSubject.add("vick96 123456 victorzele96@gmail.com");
-        final String[] viewArray = bodyOfSubject.get(choice).split(" ", 5);
+        final ArrayList<String> subjectName = new ArrayList<>();
+        final ArrayList<String> bodyOfSubject = new ArrayList<>();
 
 
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, subjectName);
-        this.listView.setAdapter(arrayAdapter);
-
-        this.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        this.addPass.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(Pass_table.this, "Clicked item " + (position +1) + "\nUser name: " + viewArray[0] +
-                                                                                                "\nPassword: " + viewArray[1] +
-                                                                                                "\nEmail: " + viewArray[2], Toast.LENGTH_LONG).show();
+            public void onClick(View v) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(Pass_table.this);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_add_pass, null);
+                final EditText et_subject = mView.findViewById(R.id.subject);
+                final EditText et_userName = mView.findViewById(R.id.user_name);
+                final EditText et_password = mView.findViewById(R.id.password);
+                final EditText et_email = mView.findViewById(R.id.e_mail);
+                Button btn_save = mView.findViewById(R.id.save_pass);
+
+                btn_save.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        subjectName.add(et_subject.getText().toString());
+                        String str;
+                        str = et_userName.getText().toString() + " " + et_password.getText().toString() + " " + et_email.getText().toString();
+                        bodyOfSubject.add(str);
+
+                        ArrayAdapter arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, subjectName);
+                        listView.setAdapter(arrayAdapter);
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                choice = position;
+                                String[] viewArray = bodyOfSubject.get(position).split(" ", 5);
+                                Toast.makeText(Pass_table.this, "Clicked item " + (position +1) + "\nUser name: " + viewArray[0] +
+                                        "\nPassword: " + viewArray[1] +
+                                        "\nEmail: " + viewArray[2], Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                        Toast.makeText(Pass_table.this, "Password Saved !", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                mBuilder.setView(mView);
+                AlertDialog dialog = mBuilder.create();
+                dialog.show();
             }
         });
+
+        this.removePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        this.deleteTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteFile(textView.getText().toString());
+                Toast.makeText(Pass_table.this, "Deleting file completed !", Toast.LENGTH_LONG).show();
+                /*
+                add the option to return to first activity after deleting the file and custom dialog to check if sure want to delete the topic.
+                 */
+            }
+        });
+
+
+//        subjectName.add("victor");
+//        choice = subjectName.indexOf("victor");
+//        bodyOfSubject.add("vick96 123456 victorzele96@gmail.com");
     }
 
     public void factoryMethod(String method){

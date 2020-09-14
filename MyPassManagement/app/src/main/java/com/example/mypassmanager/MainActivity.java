@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
     private Button continueButton, createTopic;
     private EditText editTopicValue;
     public static final String EXTRA_TEXT = "com.example.mypassmanager.topic_name";
+    private File fileDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,26 +50,32 @@ public class MainActivity extends AppCompatActivity {
 
     public void openTopicActivity(){
         String topicName = this.editTopicValue.getText().toString();
-        if(topicName.equals("Fill in topic") || topicName.equals("")) {
+        if(topicName.equals("")) {
             topicError("");
-            Toast.makeText(this, "Try another name topic!!! ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Try another name topic!!! \n Fill topic please...", Toast.LENGTH_SHORT).show();
         }
         else {
-            Intent intent = new Intent(this, Pass_table.class);
-            intent.putExtra(EXTRA_TEXT, topicName);
-            startActivity(intent);
+            this.fileDir = new File(getFilesDir(), topicName);//get dir of file where he saved
+            if(this.fileDir.exists()) {
+                Intent intent = new Intent(this, Pass_table.class);
+                intent.putExtra(EXTRA_TEXT, topicName);
+                Toast.makeText(MainActivity.this, "Please wait...", Toast.LENGTH_SHORT).show();
+                startActivity(intent);
+            }
+            else
+                Toast.makeText(MainActivity.this, "Wrong topic name... Try another." + "\nOr topic does not exist. ", Toast.LENGTH_LONG).show();
         }
     }
 
     public void createNewTopic(){
         String topicName = this.editTopicValue.getText().toString();
-        if(topicName.length() == 0 || topicName.equals("Fill in topic"))
+        if(topicName.length() == 0)
             topicError("Cannot create empty topic");
         else {// open new empty file called by editTopicValue
             try {
                 FileOutputStream fOut = openFileOutput(topicName, MODE_PRIVATE);
                 fOut.close();
-                File fileDir = new File(getFilesDir(), topicName);//get dir of file where he saved
+                this.fileDir = new File(getFilesDir(), topicName);//get dir of file where he saved
                 Toast.makeText(getBaseContext(), "File Saved at " + fileDir, Toast.LENGTH_LONG).show();
 //                Toast.makeText(MainActivity.this, "Topic created successfully.", Toast.LENGTH_SHORT).show();
             }
