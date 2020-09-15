@@ -21,7 +21,7 @@ public class Pass_table extends AppCompatActivity {
     private String topicName;
     private Button deleteTopic, updatePass, removePass, addPass;
     private int choice;
-    AlertDialog dialog;
+    AlertDialog add_dialog, remove_dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,21 +75,46 @@ public class Pass_table extends AppCompatActivity {
                                         "\nEmail: " + viewArray[2], Toast.LENGTH_LONG).show();
                             }
                         });
-                        dialog.dismiss();
+                        add_dialog.dismiss();
                         Toast.makeText(Pass_table.this, "Password Saved !", Toast.LENGTH_SHORT).show();
                     }
                 });
 
                 mBuilder.setView(mView);
-                dialog = mBuilder.create();
-                dialog.show();
+                add_dialog = mBuilder.create();
+                add_dialog.show();
+
             }
         });
 
         this.removePass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(Pass_table.this);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_remove_pass, null);
+                final EditText et_item_id = mView.findViewById(R.id.item_id);
+                Button btn_remove = mView.findViewById(R.id.remove_pass);
 
+                btn_remove.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int num = Integer.parseInt(et_item_id.getText().toString());
+                        if(1 <= num && num <= subjectName.size()) {
+                            subjectName.remove(num);
+                            bodyOfSubject.remove(num);
+                            ArrayAdapter arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, subjectName);
+                            listView.setAdapter(arrayAdapter);
+
+                            Toast.makeText(Pass_table.this, "Password successfully removed. ", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            Toast.makeText(Pass_table.this, "There is no such identification number - " + Integer.parseInt(et_item_id.getText().toString()), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                mBuilder.setView(mView);
+                remove_dialog = mBuilder.create();
+                remove_dialog.show();
             }
         });
 
@@ -104,11 +129,6 @@ public class Pass_table extends AppCompatActivity {
                  */
             }
         });
-
-
-//        subjectName.add("victor");
-//        choice = subjectName.indexOf("victor");
-//        bodyOfSubject.add("vick96 123456 victorzele96@gmail.com");
     }
 
     public void factoryMethod(String method){
