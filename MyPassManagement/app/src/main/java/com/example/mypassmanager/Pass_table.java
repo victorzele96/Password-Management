@@ -21,6 +21,7 @@ public class Pass_table extends AppCompatActivity {
     private String topicName;
     private Button deleteTopic, updatePass, removePass, addPass;
     private int choice;
+    AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +75,13 @@ public class Pass_table extends AppCompatActivity {
                                         "\nEmail: " + viewArray[2], Toast.LENGTH_LONG).show();
                             }
                         });
-
+                        dialog.dismiss();
                         Toast.makeText(Pass_table.this, "Password Saved !", Toast.LENGTH_SHORT).show();
                     }
                 });
 
                 mBuilder.setView(mView);
-                AlertDialog dialog = mBuilder.create();
+                dialog = mBuilder.create();
                 dialog.show();
             }
         });
@@ -97,8 +98,9 @@ public class Pass_table extends AppCompatActivity {
             public void onClick(View v) {
                 deleteFile(textView.getText().toString());
                 Toast.makeText(Pass_table.this, "Deleting file completed !", Toast.LENGTH_LONG).show();
+                finish();
                 /*
-                add the option to return to first activity after deleting the file and custom dialog to check if sure want to delete the topic.
+                add the option custom dialog to check if sure want to delete the topic.
                  */
             }
         });
