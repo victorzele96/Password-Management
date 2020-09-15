@@ -21,7 +21,8 @@ public class Pass_table extends AppCompatActivity {
     private String topicName;
     private Button deleteTopic, updatePass, removePass, addPass;
     private int choice;
-    AlertDialog add_dialog, remove_dialog;
+    private AlertDialog add_dialog, remove_dialog;
+    private ArrayAdapter arrayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +41,6 @@ public class Pass_table extends AppCompatActivity {
 
         this.listView = (ListView) findViewById(R.id.dataView);
         final ArrayList<String> subjectName = new ArrayList<>();
-        final ArrayList<String> bodyOfSubject = new ArrayList<>();
-        final ArrayAdapter arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, subjectName);
-        listView.setAdapter(arrayAdapter);
-
 
         this.addPass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,21 +56,21 @@ public class Pass_table extends AppCompatActivity {
                 btn_save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        subjectName.add(et_subject.getText().toString());
                         String str;
-                        str = et_userName.getText().toString() + " " + et_password.getText().toString() + " " + et_email.getText().toString();
-                        bodyOfSubject.add(str);
+                        str = et_subject.getText().toString() + " " + et_userName.getText().toString() + " " + et_password.getText().toString() + " " + et_email.getText().toString();
+                        subjectName.add(str);
 
-                        arrayAdapter.notifyDataSetChanged();
+                        arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
+                        listView.setAdapter(arrayAdapter);
 
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                 choice = position;
-                                String[] viewArray = bodyOfSubject.get(position).split(" ", 5);
-                                Toast.makeText(Pass_table.this, "Clicked item " + (position +1) + "\nUser name: " + viewArray[0] +
-                                        "\nPassword: " + viewArray[1] +
-                                        "\nEmail: " + viewArray[2], Toast.LENGTH_LONG).show();
+                                String[] viewArray = subjectName.get(position).split(" ", 5);
+                                Toast.makeText(Pass_table.this, "Clicked item " + (position +1) + "\nUser name: " + viewArray[1] +
+                                        "\nPassword: " + viewArray[2] +
+                                        "\nEmail: " + viewArray[3], Toast.LENGTH_LONG).show();
                             }
                         });
                         add_dialog.dismiss();
@@ -91,7 +88,7 @@ public class Pass_table extends AppCompatActivity {
         this.removePass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder mBuilder = new AlertDialog.Builder(Pass_table.this);
+                AlertDialog.Builder mBuilder_remove = new AlertDialog.Builder(Pass_table.this);
                 View mView = getLayoutInflater().inflate(R.layout.dialog_remove_pass, null);
                 final EditText et_item_id = mView.findViewById(R.id.item_id);
                 Button btn_remove = mView.findViewById(R.id.remove_pass);
@@ -99,12 +96,12 @@ public class Pass_table extends AppCompatActivity {
                 btn_remove.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int num = Integer.parseInt(et_item_id.getText().toString());
-                        if(1 <= num && num <= subjectName.size()) {
-//                            subjectName.remove(num);
-//                            bodyOfSubject.remove(num);
-//                            arrayAdapter.remove(arrayAdapter.getItem(num));
-////                            arrayAdapter.notifyDataSetChanged();
+                        int num = Integer.parseInt(et_item_id.getText().toString()) -1;
+                        if(0 <= num && num < subjectName.size()) {
+
+                            subjectName.remove(num);
+                            arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
+                            listView.setAdapter(arrayAdapter);
 
                             remove_dialog.dismiss();
                             Toast.makeText(Pass_table.this, "Password successfully removed. ", Toast.LENGTH_SHORT).show();
@@ -114,8 +111,8 @@ public class Pass_table extends AppCompatActivity {
                         }
                     }
                 });
-                mBuilder.setView(mView);
-                remove_dialog = mBuilder.create();
+                mBuilder_remove.setView(mView);
+                remove_dialog = mBuilder_remove.create();
                 remove_dialog.show();
             }
         });
@@ -131,6 +128,15 @@ public class Pass_table extends AppCompatActivity {
                  */
             }
         });
+    }
+
+    public ArrayList<String> extractName(ArrayList<String> array){
+        ArrayList<String> str = new ArrayList<>();
+        for(int i=0; i < array.size(); i++) {
+            String[] viewArray = array.get(i).split(" ", 5);
+            str.add(viewArray[0]);
+        }
+        return str;
     }
 
     public void factoryMethod(String method){
