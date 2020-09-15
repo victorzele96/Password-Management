@@ -41,6 +41,8 @@ public class Pass_table extends AppCompatActivity {
         this.listView = (ListView) findViewById(R.id.dataView);
         final ArrayList<String> subjectName = new ArrayList<>();
         final ArrayList<String> bodyOfSubject = new ArrayList<>();
+        final ArrayAdapter arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, subjectName);
+        listView.setAdapter(arrayAdapter);
 
 
         this.addPass.setOnClickListener(new View.OnClickListener() {
@@ -62,8 +64,7 @@ public class Pass_table extends AppCompatActivity {
                         str = et_userName.getText().toString() + " " + et_password.getText().toString() + " " + et_email.getText().toString();
                         bodyOfSubject.add(str);
 
-                        ArrayAdapter arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, subjectName);
-                        listView.setAdapter(arrayAdapter);
+                        arrayAdapter.notifyDataSetChanged();
 
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
@@ -100,11 +101,12 @@ public class Pass_table extends AppCompatActivity {
                     public void onClick(View v) {
                         int num = Integer.parseInt(et_item_id.getText().toString());
                         if(1 <= num && num <= subjectName.size()) {
-                            subjectName.remove(num);
-                            bodyOfSubject.remove(num);
-                            ArrayAdapter arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, subjectName);
-                            listView.setAdapter(arrayAdapter);
+//                            subjectName.remove(num);
+//                            bodyOfSubject.remove(num);
+//                            arrayAdapter.remove(arrayAdapter.getItem(num));
+////                            arrayAdapter.notifyDataSetChanged();
 
+                            remove_dialog.dismiss();
                             Toast.makeText(Pass_table.this, "Password successfully removed. ", Toast.LENGTH_SHORT).show();
                         }
                         else{
