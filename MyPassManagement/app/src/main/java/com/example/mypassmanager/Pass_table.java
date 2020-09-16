@@ -21,7 +21,7 @@ public class Pass_table extends AppCompatActivity {
     private String topicName;
     private Button deleteTopic, updatePass, removePass, addPass;
     private int choice;
-    private AlertDialog add_dialog, remove_dialog;
+    private AlertDialog add_dialog, remove_dialog, update_dialog;
     private ArrayAdapter arrayAdapter;
 
     @Override
@@ -114,6 +114,28 @@ public class Pass_table extends AppCompatActivity {
                 mBuilder_remove.setView(mView);
                 remove_dialog = mBuilder_remove.create();
                 remove_dialog.show();
+            }
+        });
+
+        this.updatePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder mBuilder_update = new AlertDialog.Builder(Pass_table.this);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_update_pass, null);
+                Button btn_update = mView.findViewById(R.id.update_pass);
+                Button btn_ok = mView.findViewById(R.id.check_pass_id);
+                final EditText et_item_id = mView.findViewById(R.id.choose);
+                final EditText et_subject = mView.findViewById(R.id.subject);
+                final EditText et_user_name = mView.findViewById(R.id.user_name);
+                final EditText et_password = mView.findViewById(R.id.password);
+                final EditText et_e_mail = mView.findViewById(R.id.e_mail);
+
+
+
+
+                mBuilder_update.setView(mView);
+                update_dialog = mBuilder_update.create();
+                update_dialog.show();
             }
         });
 
