@@ -21,7 +21,7 @@ public class Pass_table extends AppCompatActivity {
     private String topicName;
     private Button deleteTopic, updatePass, removePass, addPass;
     private int choice;
-    private AlertDialog add_dialog, remove_dialog, update_dialog;
+    private AlertDialog add_dialog, remove_dialog, update_dialog, delete_dialog;
     private ArrayAdapter arrayAdapter;
 
     @Override
@@ -130,9 +130,37 @@ public class Pass_table extends AppCompatActivity {
                 final EditText et_password = mView.findViewById(R.id.password);
                 final EditText et_e_mail = mView.findViewById(R.id.e_mail);
 
+                btn_ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int num = Integer.parseInt(et_item_id.getText().toString()) -1;
+                        if(0 <= num && num < subjectName.size()){
+                            String[] viewArray = subjectName.get(num).split(" ", 5);
+                            et_subject.setText(viewArray[0]);
+                            et_user_name.setText(viewArray[1]);
+                            et_password.setText(viewArray[2]);
+                            et_e_mail.setText(viewArray[3]);
+                        }
+                        else{
+                            Toast.makeText(Pass_table.this, "There is no such identification number - " + Integer.parseInt(et_item_id.getText().toString()), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
 
+                btn_update.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int num = Integer.parseInt(et_item_id.getText().toString()) -1;
+                        String str;
+                        str = et_subject.getText().toString() + " " + et_user_name.getText().toString() + " " + et_password.getText().toString() + " " + et_e_mail.getText().toString();
+                        subjectName.set(num, str);
+                        arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
+                        listView.setAdapter(arrayAdapter);
 
-
+                        update_dialog.dismiss();
+                        Toast.makeText(Pass_table.this, "Password updated ! ", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 mBuilder_update.setView(mView);
                 update_dialog = mBuilder_update.create();
                 update_dialog.show();
@@ -142,12 +170,30 @@ public class Pass_table extends AppCompatActivity {
         this.deleteTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteFile(textView.getText().toString());
-                Toast.makeText(Pass_table.this, "Deleting file completed !", Toast.LENGTH_LONG).show();
-                finish();
-                /*
-                add the option custom dialog to check if sure want to delete the topic.
-                 */
+                AlertDialog.Builder mBuilder_delete = new AlertDialog.Builder(Pass_table.this);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_delete_topic, null);
+                Button btn_yes = mView.findViewById(R.id.yes_answer);
+                Button btn_no = mView.findViewById(R.id.no_answer);
+
+                btn_yes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        deleteFile(textView.getText().toString());
+                        Toast.makeText(Pass_table.this, "Deleting file completed !", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                });
+
+                btn_no.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        delete_dialog.dismiss();
+                    }
+                });
+
+                mBuilder_delete.setView(mView);
+                delete_dialog = mBuilder_delete.create();
+                delete_dialog.show();
             }
         });
     }
