@@ -14,6 +14,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Pass_table extends AppCompatActivity {
@@ -40,7 +46,21 @@ public class Pass_table extends AppCompatActivity {
         this.deleteTopic = findViewById(R.id.deleteTopic);
 
         this.listView = (ListView) findViewById(R.id.dataView);
-        final ArrayList<String> subjectName = new ArrayList<>();
+        final ArrayList<String> subjectName = readFile(this.topicName);
+
+        arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
+        listView.setAdapter(arrayAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                choice = position;
+                String[] viewArray = subjectName.get(position).split(" ", 5);
+                Toast.makeText(Pass_table.this, "Clicked item " + (position +1) + "\nUser name: " + viewArray[1] +
+                        "\nPassword: " + viewArray[2] +
+                        "\nEmail: " + viewArray[3], Toast.LENGTH_LONG).show();
+            }
+        });
 
         this.addPass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,16 +83,7 @@ public class Pass_table extends AppCompatActivity {
                         arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
                         listView.setAdapter(arrayAdapter);
 
-                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                choice = position;
-                                String[] viewArray = subjectName.get(position).split(" ", 5);
-                                Toast.makeText(Pass_table.this, "Clicked item " + (position +1) + "\nUser name: " + viewArray[1] +
-                                        "\nPassword: " + viewArray[2] +
-                                        "\nEmail: " + viewArray[3], Toast.LENGTH_LONG).show();
-                            }
-                        });
+                        writeFile(topicName, subjectName);
                         add_dialog.dismiss();
                         Toast.makeText(Pass_table.this, "Password Saved !", Toast.LENGTH_SHORT).show();
                     }
@@ -103,6 +114,7 @@ public class Pass_table extends AppCompatActivity {
                             arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
                             listView.setAdapter(arrayAdapter);
 
+                            writeFile(topicName, subjectName);
                             remove_dialog.dismiss();
                             Toast.makeText(Pass_table.this, "Password successfully removed. ", Toast.LENGTH_SHORT).show();
                         }
@@ -157,6 +169,7 @@ public class Pass_table extends AppCompatActivity {
                         arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
                         listView.setAdapter(arrayAdapter);
 
+                        writeFile(topicName, subjectName);
                         update_dialog.dismiss();
                         Toast.makeText(Pass_table.this, "Password updated ! ", Toast.LENGTH_SHORT).show();
                     }
@@ -200,6 +213,7 @@ public class Pass_table extends AppCompatActivity {
 
     public ArrayList<String> extractName(ArrayList<String> array){
         ArrayList<String> str = new ArrayList<>();
+
         for(int i=0; i < array.size(); i++) {
             String[] viewArray = array.get(i).split(" ", 5);
             str.add(viewArray[0]);
@@ -207,7 +221,58 @@ public class Pass_table extends AppCompatActivity {
         return str;
     }
 
-    public void factoryMethod(String method){
+    public ArrayList<String> readFile(String nameFile){
+        ArrayList<String> str = new ArrayList<>();
+        FileInputStream fis = null;
+        try {
+            fis = openFileInput(nameFile);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+//            StringBuilder sb = new StringBuilder();
+            String text;
+            while ((text = br.readLine()) != null) {
+//                sb.append(text).append("\n");
+                str.add(text);
+            }
+//            mEditText.setText(sb.toString());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return str;
+    }
 
+
+    public void writeFile(String nameFile, ArrayList<String> arr) {
+        String text = "";
+        for(int i = 0; i < arr.size(); i++)
+            text += arr.get(i) + "\n";
+
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(nameFile, MODE_PRIVATE);
+            fos.write(text.getBytes());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
