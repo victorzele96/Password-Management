@@ -29,6 +29,7 @@ public class Pass_table extends AppCompatActivity {
     private int choice;
     private AlertDialog add_dialog, remove_dialog, update_dialog, delete_dialog;
     private ArrayAdapter arrayAdapter;
+//    private Enc_Dec enc_dec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,15 @@ public class Pass_table extends AppCompatActivity {
         Intent intent = getIntent();
         this.topicName = intent.getStringExtra(MainActivity.EXTRA_TEXT);
         final TextView textView = (TextView) findViewById(R.id.topicName);
-        textView.setText(this.topicName);
+        String name = this.topicName.substring(0,1).toUpperCase() + this.topicName.substring(1).toLowerCase();
+        textView.setText(name);
+
+//        try {
+//            textView.setText(Enc_Dec.encrypt(name));
+//            textView.setText(Enc_Dec.decrypt(textView.getText().toString()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         this.addPass = findViewById(R.id.add);
         this.removePass = findViewById(R.id.remove);
@@ -83,7 +92,11 @@ public class Pass_table extends AppCompatActivity {
                         arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
                         listView.setAdapter(arrayAdapter);
 
-                        writeFile(topicName, subjectName);
+                        try {
+                            writeFile(topicName, subjectName);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         add_dialog.dismiss();
                         Toast.makeText(Pass_table.this, "Password Saved !", Toast.LENGTH_SHORT).show();
                     }
@@ -114,7 +127,11 @@ public class Pass_table extends AppCompatActivity {
                             arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
                             listView.setAdapter(arrayAdapter);
 
-                            writeFile(topicName, subjectName);
+                            try {
+                                writeFile(topicName, subjectName);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             remove_dialog.dismiss();
                             Toast.makeText(Pass_table.this, "Password successfully removed. ", Toast.LENGTH_SHORT).show();
                         }
@@ -169,7 +186,11 @@ public class Pass_table extends AppCompatActivity {
                         arrayAdapter = new ArrayAdapter(Pass_table.this, android.R.layout.simple_list_item_1, extractName(subjectName));
                         listView.setAdapter(arrayAdapter);
 
-                        writeFile(topicName, subjectName);
+                        try {
+                            writeFile(topicName, subjectName);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         update_dialog.dismiss();
                         Toast.makeText(Pass_table.this, "Password updated ! ", Toast.LENGTH_SHORT).show();
                     }
@@ -228,16 +249,18 @@ public class Pass_table extends AppCompatActivity {
             fis = openFileInput(nameFile);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
-//            StringBuilder sb = new StringBuilder();
+
             String text;
             while ((text = br.readLine()) != null) {
-//                sb.append(text).append("\n");
-                str.add(text);
+//                str.add(text);
+                str.add(Enc_Dec.decrypt(text));
             }
-//            mEditText.setText(sb.toString());
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (fis != null) {
@@ -252,11 +275,12 @@ public class Pass_table extends AppCompatActivity {
     }
 
 
-    public void writeFile(String nameFile, ArrayList<String> arr) {
+    public void writeFile(String nameFile, ArrayList<String> arr) throws Exception {
         String text = "";
-        for(int i = 0; i < arr.size(); i++)
-            text += arr.get(i) + "\n";
-
+        for(int i = 0; i < arr.size(); i++) {
+//            text += arr.get(i) + "\n";
+            text += Enc_Dec.encrypt(arr.get(i)) + "\n";
+        }
         FileOutputStream fos = null;
         try {
             fos = openFileOutput(nameFile, MODE_PRIVATE);
