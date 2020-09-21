@@ -1,9 +1,5 @@
 package com.example.mypassmanager;
 
-import android.util.Base64;
-
-import java.security.MessageDigest;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
